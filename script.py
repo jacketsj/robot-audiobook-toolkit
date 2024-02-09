@@ -10,9 +10,10 @@ if not torch.cuda.is_available():
 
 pipe = Pipeline()
 
-def split_into_sentences(text):
-    # Simple regex to split sentences. This is quite naive and may not handle all cases well.
+def split_into_sentences(text, filter_pattern=None):
     sentences = re.split(r'(?<=\w\.)\s+(?=[A-Z])', text)
+    if filter_pattern:
+        sentences = [sentence for sentence in sentences if not re.search(filter_pattern, sentence)]
     return sentences
 
 def concatenate_audio_files(files, output_path):
@@ -22,10 +23,10 @@ def concatenate_audio_files(files, output_path):
         combined += audio
     combined.export(output_path, format="wav")
 
-def process_input_file(input_file, wav_file=None, filter_pattern=None):
+def process_input_file(input_file, voice=None, filter_pattern=None, final_output=None):
     speaker_emb = None
-    if wav_file:
-        speaker_emb = pipe.extract_spk_emb(wav_file)
+    if voice:
+        speaker_emb = pipe.extract_spk_emb(voice)
 
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
@@ -33,11 +34,11 @@ def process_input_file(input_file, wav_file=None, filter_pattern=None):
     accumulated_text = ""
     with open(input_file, 'r') as file:
         for line in file:
-            if filter_pattern is None or not re.search(filter_pattern, line):
+            if not accumulated_text.endswith(' '):
                 accumulated_text += " "
             accumulated_text += line.strip()
 
-    sentences = split_into_sentences(accumulated_text)
+    sentences = split_into_sentences(accumulated_text, filter_pattern)
     generated_files = []
 
     for i, sentence in enumerate(sentences):
@@ -47,20 +48,23 @@ def process_input_file(input_file, wav_file=None, filter_pattern=None):
             generated_files.append(output_filename)
 
     if generated_files:
-        concatenated_filename = f"{output_dir}/output_combined.wav"
-        concatenate_audio_files(generated_files, concatenated_filename)
-        print(f"All sentences concatenated into: {concatenated_filename}")
+        if not final_output:
+            final_output = f"{output_dir}/output_combined.wav"
+        concatenate_audio_files(generated_files, final_output)
+        print(f"All sentences concatenated into: {final_output}")
     else:
         print("No sentences generated.")
 
 def main():
     parser = argparse.ArgumentParser(description='Process a text file for WhisperSpeech generation, splitting by more accurate sentence end, and concatenate into a single WAV.')
     parser.add_argument('input_file', type=str, help='The input text file')
-    parser.add_argument('--wav_file', type=str, help='Optional WAV file for speaker embedding', default=None)
+    parser.add_argument('--voice', type=str, help='Optional WAV file for speaker embedding', default=None)
     parser.add_argument('--filter_pattern', type=str, help='Regex pattern to filter lines from the text file', default=None)
+    parser.add_argument('--final_output', type=str, help='Optional final output WAV file name', default=None)
     args = parser.parse_args()
 
-    process_input_file(args.input_file, args.wav_file, args.filter_pattern)
+    process_input_file(args.input_file, args.voice, args.filter_pattern, args.final_output)
 
 if __name__ == "__main__":
     main()
+

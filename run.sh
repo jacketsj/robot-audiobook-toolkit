@@ -16,26 +16,48 @@ pip install torch torchvision torchaudio --extra-index-url https://download.pyto
 pip install -Uqq WhisperSpeech
 pip install -Uqq pydub
 
-# Check if at least one argument (input file) is provided
-if [ "$#" -lt 1 ]; then
-    echo "Usage: $0 <input_file> [wav_file] [filter_pattern]"
+# Initialize variables for arguments
+input_file=""
+voice=""
+filter_pattern=""
+final_output=""
+
+# Parse named arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --input_file) input_file="$2"; shift ;;
+        --voice) voice="$2"; shift ;;
+        --filter_pattern) filter_pattern="$2"; shift ;;
+        --final_output) final_output="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+if [ -z "$input_file" ]; then
+    echo "Usage: $0 --input_file <input_file> [--voice <voice_sample.wav>] [--filter_pattern <filter_pattern>] [--final_output <final_output>]"
     deactivate
     exit 1
 fi
 
-# Check the number of arguments and call the Python script accordingly
-if [ "$#" -eq 3 ]; then
-    python script.py "$1" --wav_file "$2" --filter_pattern "$3"
-elif [ "$#" -eq 2 ]; then
-    # Determine if the second argument is a wav file or filter pattern based on its extension or format
-    if [[ "$2" =~ \.wav$ ]]; then
-        python script.py "$1" --wav_file "$2"
-    else
-        python script.py "$1" --filter_pattern "$2"
-    fi
-else
-    python script.py "$1"
+# Construct the command to call the Python script
+CMD="python script.py \"$input_file\""
+
+# Add optional arguments if they were provided
+if [ ! -z "$voice" ]; then
+    CMD+=" --voice \"$voice\""
 fi
+
+if [ ! -z "$filter_pattern" ]; then
+    CMD+=" --filter_pattern \"$filter_pattern\""
+fi
+
+if [ ! -z "$final_output" ]; then
+    CMD+=" --final_output \"$final_output\""
+fi
+
+# Execute the constructed command
+eval $CMD
 
 deactivate
 
