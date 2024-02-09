@@ -10,10 +10,8 @@ if not torch.cuda.is_available():
 
 pipe = Pipeline()
 
-def split_into_sentences(text, filter_pattern=None):
+def split_into_sentences(text):
     sentences = re.split(r'(?<=\w\.)\s+(?=[A-Z])', text)
-    if filter_pattern:
-        sentences = [sentence for sentence in sentences if not re.search(filter_pattern, sentence)]
     return sentences
 
 def concatenate_audio_files(files, output_path):
@@ -34,11 +32,12 @@ def process_input_file(input_file, voice=None, filter_pattern=None, final_output
     accumulated_text = ""
     with open(input_file, 'r') as file:
         for line in file:
-            if not accumulated_text.endswith(' '):
-                accumulated_text += " "
-            accumulated_text += line.strip()
+            if filter_pattern is None or not re.search(filter_pattern, line):
+                if not accumulated_text.endswith(' '):
+                    accumulated_text += " "
+                accumulated_text += line.strip()
 
-    sentences = split_into_sentences(accumulated_text, filter_pattern)
+    sentences = split_into_sentences(accumulated_text)
     generated_files = []
 
     for i, sentence in enumerate(sentences):
