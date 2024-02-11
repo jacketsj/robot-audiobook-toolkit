@@ -1,6 +1,10 @@
+# Robot Audiobook Generator Toolkit
 This toolkit is for generating robot-audiobooks from PDFs, by making use of [WhisperSpeech](https://github.com/collabora/WhisperSpeech).
 
-Usage guidelines:
+## Warning
+All the code in this repo was extremely lazily written, and has not been properly tested. Good luck. Feel free to make pull requests if you think you can make it decent.
+
+## Usage guidelines:
 1. Use a PDF file for a book.
 2. Use 'convert_to_text.sh' to read the table of contents (e.g., on pages 2-3):
 ```sh
@@ -36,7 +40,7 @@ This should result in a txt file for each chapter in `chapter_texts/` (or somewh
 ```
 The `--filter_pattern` argument is for filtering out lines of text containing things like page numbers. It can be omitted, or replaced with a different pattern.
 
-7. Use the `concatenate_wav_files.py` script to generate a single, large, audio file:
+7. Use the `concatenate_wav_files.py` script to generate a single, large, audio file (if you want one):
 ```sh
 python3 concatenate_wave_files.py output.wav output/chapter*.wav
 ```
