@@ -15,7 +15,7 @@ def concatenate_wav_files(output_file, input_files):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python script.py output.wav input1.wav input2.wav [input3.wav ...]")
+        print("Usage: python concatenate_wav_files.py output.wav input1.wav input2.wav [input3.wav ...]")
         sys.exit(0)
 
     output_filename = sys.argv[1]
