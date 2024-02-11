@@ -32,14 +32,17 @@ for input_file in "${input_files[@]}"; do
     
     # Add optional arguments if they were provided
     if [ ! -z "$voice" ]; then
+        echo "Applying custom voice"
         CMD+=" --voice \"$voice\""
     fi
     if [ ! -z "$filter_pattern" ]; then
+        echo "Applying filter pattern"
         CMD+=" --filter_pattern \"$filter_pattern\""
     fi
 
     # Execute the constructed command
     echo "Processing $input_file..."
+    echo "Running $CMD"
     eval $CMD
 done
 

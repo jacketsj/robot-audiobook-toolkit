@@ -29,6 +29,8 @@ def process_input_file(input_file, voice=None, filter_pattern=None, final_output
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
 
+    print("Using filter_pattern: ", filter_pattern)
+
     accumulated_text = ""
     with open(input_file, 'r') as file:
         for line in file:
@@ -36,6 +38,8 @@ def process_input_file(input_file, voice=None, filter_pattern=None, final_output
                 if not accumulated_text.endswith(' '):
                     accumulated_text += " "
                 accumulated_text += line.strip()
+            else:
+                print("Filtered out line: ", line)
 
     sentences = split_into_sentences(accumulated_text)
     generated_files = []
