@@ -30,7 +30,8 @@ def parse_toc(toc_file):
 
 def run_conversion(chapters, input_file, output_folder):
     for i, (title, start_page, end_page) in enumerate(chapters, start=1):
-        output_file = f"{output_folder}/chapter_{i}_{title.replace(' ', '_')}.txt"
+        formatted_i = f"{i:0{len(str(len(chapters)))}d}"
+        output_file = f"{output_folder}/chapter_{formatted_i}_{title.replace(' ', '_')}.txt"
         page_range = f"{start_page}-{end_page}"
         command = f"./convert_to_text.sh \"{input_file}\" \"{output_file}\" \"{page_range}\""
         print(f"Processing: {title} | Pages: {page_range}")
