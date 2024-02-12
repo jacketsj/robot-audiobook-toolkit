@@ -34,6 +34,6 @@ This should result in a txt file for each chapter in `chapter_texts/` (or somewh
 The `--filter_pattern` argument is for filtering out lines of text containing things like page numbers. It can be omitted, or replaced with a different pattern.
 7. Use the `concatenate_wav_files.py` script to generate a single, large, audio file:
 ```sh
-python3 concatenate_wave_files.py output.wav output/chapter*.wav
+python3 concatenate_wav_files.py output.wav output/chapter*.wav
 ```
 8. Convert to an mp3 (or other compressed format) with a different program of your choice, and start listening.
